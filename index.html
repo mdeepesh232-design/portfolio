@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deepesh M — Hardware & VLSI Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0B0D0F;
+    --panel: #15181B;
+    --panel-hi: #1D2226;
+    --line: #262C31;
+    --line-hi: #3B444B;
+    --ink: #F1F2F4;
+    --ink-dim: #9BA5AC;
+    --ink-faint: #5B646B;
+    --teal: #55E5CC;
+    --teal-dim: #2C6E64;
+    --amber: #F2A93C;
+    --max: 1140px;
+    --r: 14px;
+    --r-sm: 8px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    position:relative;
+    overflow-x:hidden;
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+  h1,h2,h3{ font-family:'Space Grotesk', sans-serif; font-weight:600; letter-spacing:-0.01em; }
+  a{ color:inherit; }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  .wrap{ max-width: var(--max); margin: 0 auto; padding: 0 32px; position:relative; z-index:1; }
+  ::selection{ background: var(--teal); color:#08110F; }
+  :focus-visible{ outline: 2px solid var(--teal); outline-offset: 3px; }
+
+  /* ambient glow field across the whole page, not just hero */
+  .glow-field{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .glow-field span{ position:absolute; border-radius:50%; filter: blur(110px); opacity:0.16; }
+  .g1{ width:620px; height:620px; background: var(--teal); top:-220px; left:-160px; }
+  .g2{ width:520px; height:520px; background: #3E7BD9; top:900px; right:-200px; opacity:0.12; }
+  .g3{ width:560px; height:560px; background: var(--teal); top:1900px; left:-220px; opacity:0.10; }
+  .g4{ width:480px; height:480px; background: var(--amber); bottom:-160px; right:-140px; opacity:0.08; }
+
+  .grid-bg{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 1000px 700px at 20% 0%, black, transparent 75%);
+  }
+
+  /* ---- nav ---- */
+  nav{
+    position: sticky; top:0; z-index:50;
+    background: rgba(11,13,15,0.78);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav .wrap{ display:flex; align-items:center; justify-content:space-between; height:60px; }
+  .nav-mark{ font-family:'Space Grotesk'; font-weight:700; font-size:16px; letter-spacing:0.01em; }
+  .nav-mark .dot{ color: var(--teal); }
+  .nav-links{ display:flex; gap:30px; list-style:none; font-size:13.5px; color:var(--ink-dim); }
+  .nav-links a{ text-decoration:none; transition: color .15s; }
+  .nav-links a:hover{ color: var(--ink); }
+  @media (max-width:640px){ .nav-links{ display:none; } }
+  .nav-cta{ font-size:13px; border:1px solid var(--line-hi); border-radius: 999px; padding:8px 16px; text-decoration:none; color:var(--ink); transition: all .2s;}
+  .nav-cta:hover{ border-color: var(--teal); color: var(--teal); box-shadow: 0 0 20px -4px rgba(85,229,204,0.5); }
+
+  /* ---- hero ---- */
+  header.hero{ position: relative; padding: 120px 0 0; }
+  .kicker{
+    display:inline-flex; align-items:center; gap:9px;
+    font-family:'JetBrains Mono'; font-size:12.5px; color:var(--teal);
+    letter-spacing:0.02em; margin-bottom:28px;
+    border:1px solid var(--teal-dim); border-radius:999px; padding:7px 15px 7px 13px;
+    background: rgba(85,229,204,0.05);
+  }
+  .kicker .pulse{ width:6px; height:6px; border-radius:50%; background:var(--teal); box-shadow: 0 0 10px 3px rgba(85,229,204,0.65); animation: pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.35; } }
+
+  h1.title{ font-size: clamp(46px, 8.5vw, 96px); line-height: 0.98; max-width: 900px; text-wrap: balance; }
+  .title .accent{ color: var(--teal); text-shadow: 0 0 60px rgba(85,229,204,0.45); }
+  .hero-sub{ margin-top:28px; max-width:600px; color:var(--ink-dim); font-size:18px; }
+
+  .hero-cta{ margin-top:40px; display:flex; gap:16px; flex-wrap:wrap; }
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; border-radius: 999px;
+    padding:13px 24px; font-size:14.5px; font-weight:500;
+    border:1px solid var(--line-hi); text-decoration:none; color: var(--ink);
+    transition: border-color .2s, color .2s, transform .2s, box-shadow .2s;
+  }
+  .btn.primary{ background: var(--teal); color:#06120F; border-color:var(--teal); font-weight:600; }
+  .btn.primary:hover{ box-shadow: 0 8px 32px -6px rgba(85,229,204,0.6); transform: translateY(-2px); }
+  .btn:not(.primary):hover{ border-color: var(--teal); color:var(--teal); transform: translateY(-2px); box-shadow: 0 8px 24px -8px rgba(85,229,204,0.3); }
+
+  .stat-strip{
+    margin-top: 86px; border-radius: var(--r) var(--r) 0 0; overflow:hidden;
+    border: 1px solid var(--line); border-bottom:none;
+    display:grid; grid-template-columns: repeat(4, 1fr);
+    background: linear-gradient(180deg, rgba(85,229,204,0.05), transparent);
+  }
+  @media (max-width:760px){ .stat-strip{ grid-template-columns: repeat(2,1fr); } }
+  .stat{ padding: 28px 30px; border-right:1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .stat:nth-child(2n){ border-right:none; }
+  @media (min-width:761px){ .stat:nth-child(4n){ border-right:none; } .stat:nth-child(2n){ border-right:1px solid var(--line); } }
+  .stat .num{ font-family:'Space Grotesk'; font-weight:700; font-size: clamp(24px,2.8vw,32px); color:var(--ink); }
+  .stat .num .u{ font-size:0.5em; color:var(--teal); margin-left:2px; }
+  .stat .label{ margin-top:6px; font-size:12px; color:var(--ink-faint); font-family:'JetBrains Mono'; }
+
+  /* ---- section shell ---- */
+  section{ position:relative; z-index:1; padding: 110px 0; }
+  .sec-eyebrow{ font-family:'JetBrains Mono'; font-size:12.5px; color:var(--teal); margin-bottom:14px; }
+  h2.sec-title{ font-size: clamp(30px,4.2vw,44px); margin-bottom:52px; }
+
+  /* ---- about ---- */
+  .about-grid{ display:grid; grid-template-columns: 1.15fr 0.85fr; gap:64px; }
+  @media (max-width:760px){ .about-grid{ grid-template-columns:1fr; } }
+  .about-grid p{ color:var(--ink-dim); font-size:16.5px; margin-bottom:18px; max-width: 60ch; }
+  .about-grid p strong{ color:var(--ink); font-weight:600; }
+  .stat-block{
+    border:1px solid var(--line); background: var(--panel); border-radius: var(--r);
+    box-shadow: 0 30px 60px -40px rgba(0,0,0,0.7);
+    overflow:hidden;
+  }
+  .stat-row{ display:flex; justify-content:space-between; padding:16px 24px; border-bottom:1px solid var(--line); font-size:14px; }
+  .stat-row:last-child{ border-bottom:none; }
+  .stat-row .k{ color:var(--ink-faint); font-family:'JetBrains Mono'; font-size:12.5px; }
+  .stat-row .v{ font-weight:500; }
+
+  /* ---- skills ---- */
+  .floorplan{ display:grid; grid-template-columns: repeat(4, 1fr); gap:14px; }
+  @media (max-width:760px){ .floorplan{ grid-template-columns: repeat(2,1fr); } }
+  .block{
+    background: var(--panel); border:1px solid var(--line); border-radius: var(--r);
+    padding:26px 24px; min-height:190px; display:flex; flex-direction:column;
+    transition: border-color .25s, transform .25s, box-shadow .25s;
+  }
+  .block:hover{ border-color: var(--teal-dim); transform: translateY(-3px); box-shadow: 0 20px 40px -20px rgba(85,229,204,0.25); }
+  .block .net{ font-family:'JetBrains Mono'; font-size:11px; color: var(--teal-dim); margin-bottom:14px; }
+  .block h3{ font-size:16px; margin-bottom:12px; }
+  .block ul{ list-style:none; font-size:13.5px; color:var(--ink-dim); display:flex; flex-direction:column; gap:8px; }
+  .block ul li{ padding-left:14px; position:relative; }
+  .block ul li::before{ content:""; position:absolute; left:0; top:7px; width:5px; height:5px; border-radius:50%; background: var(--ink-faint); }
+
+  /* ---- projects ---- */
+  .proj{
+    border:1px solid var(--line); background: var(--panel); border-radius: var(--r);
+    margin-bottom:18px; padding:34px 36px;
+    position:relative; overflow:hidden;
+    transition: border-color .25s, transform .25s, box-shadow .25s;
+    box-shadow: 0 30px 50px -42px rgba(0,0,0,0.8);
+  }
+  .proj::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:3px;
+    background: var(--line-hi); transition: background .25s, box-shadow .25s;
+  }
+  .proj:hover{ border-color: var(--teal-dim); transform: translateY(-3px); box-shadow: 0 30px 60px -30px rgba(85,229,204,0.18); }
+  .proj:hover::before{ background: var(--teal); box-shadow: 0 0 16px 2px rgba(85,229,204,0.7); }
+  .proj-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+  .proj-head h3{ font-size:21px; }
+  .status{ font-family:'JetBrains Mono'; font-size:11px; padding:5px 12px; border:1px solid; border-radius:999px; white-space:nowrap; height:fit-content; letter-spacing:0.02em; }
+  .status.done{ color: var(--teal); border-color: var(--teal-dim); background: rgba(85,229,204,0.08); }
+  .proj p.desc{ color: var(--ink-dim); font-size:15px; margin-top:14px; max-width:72ch; }
+  .proj .tags{ margin-top:18px; display:flex; flex-wrap:wrap; gap:8px; }
+  .proj .tags span{ font-family:'JetBrains Mono'; font-size:11px; color: var(--ink-dim); border:1px solid var(--line); border-radius:999px; padding:4px 11px; }
+  .proj .link{ margin-top:16px; font-size:13px; display:inline-flex; align-items:center; gap:6px; color: var(--teal); text-decoration:none; }
+  .proj .link:hover{ text-decoration:underline; }
+
+  .early-list{ margin-top:28px; display:grid; grid-template-columns: repeat(3,1fr); gap:14px; }
+  @media (max-width:760px){ .early-list{ grid-template-columns:1fr; } }
+  .early-item{
+    background: var(--panel); border:1px solid var(--line); border-radius: var(--r-sm);
+    padding:24px; font-size:13.5px; color:var(--ink-dim);
+    transition: border-color .25s, transform .25s;
+  }
+  .early-item:hover{ border-color: var(--line-hi); transform: translateY(-2px); }
+  .early-item h4{ font-family:'Inter'; font-weight:600; color:var(--ink); font-size:14.5px; margin-bottom:8px; }
+
+  .sub-label{ margin-top:60px; margin-bottom:22px; font-size:14px; color:var(--ink-dim); font-family:'JetBrains Mono'; display:flex; align-items:center; gap:12px; }
+  .sub-label::after{ content:""; flex:1; height:1px; background: linear-gradient(90deg, var(--line), transparent); }
+
+  /* ---- contact ---- */
+  footer.contact{ padding: 40px 0 0; position:relative; z-index:1; }
+  .contact-inner{
+    border:1px solid var(--line-hi); border-radius: 22px;
+    background:
+      radial-gradient(ellipse 650px 320px at 15% 0%, rgba(85,229,204,0.12), transparent 70%),
+      var(--panel);
+    padding: 64px 48px;
+    box-shadow: 0 40px 80px -40px rgba(0,0,0,0.8);
+  }
+  @media (max-width:640px){ .contact-inner{ padding: 44px 26px; } }
+  .contact-inner h2{ font-size: clamp(28px,4.5vw,44px); max-width:640px; line-height:1.14; }
+  .contact-links{ margin-top:36px; display:flex; gap:16px; flex-wrap:wrap; }
+  .fine{ padding: 34px 32px 50px; font-size:12.5px; color: var(--ink-faint); display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; max-width:var(--max); margin:0 auto; position:relative; z-index:1; }
+</style>
+</head>
+<body>
+<div class="glow-field"><span class="g1"></span><span class="g2"></span><span class="g3"></span><span class="g4"></span></div>
+<div class="grid-bg"></div>
+
+<nav>
+  <div class="wrap">
+    <div class="nav-mark">DEEPESH<span class="dot">·</span>M</div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+    </ul>
+    <a class="nav-cta" href="#contact">Contact</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker"><span class="pulse"></span>OPEN TO VLSI INTERNSHIPS · BENGALURU</div>
+    <h1 class="title">Building silicon<br>from RTL to <span class="accent">layout.</span></h1>
+    <p class="hero-sub">Fourth-year electronics engineer working across the chip design stack — from RTL to physical implementation — with a hardware background that starts at the PCB.</p>
+    <div class="hero-cta">
+      <a class="btn primary" href="#projects">View projects →</a>
+      <a class="btn" href="#contact">Get in touch</a>
+    </div>
+
+    <div class="stat-strip">
+      <div class="stat">
+        <div class="num">9.08<span class="u">/10</span></div>
+        <div class="label">CGPA</div>
+      </div>
+      <div class="stat">
+        <div class="num">3<span class="u">+</span></div>
+        <div class="label">PROJECTS — RTL TO SILICON, VERIFIED</div>
+      </div>
+      <div class="stat">
+        <div class="num">1</div>
+        <div class="label">IEEE PAPER SUBMITTED</div>
+      </div>
+      <div class="stat">
+        <div class="num">6</div>
+        <div class="label">CHANNEL LOGIC ANALYZER, SHIPPED</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="about">
+  <div class="wrap">
+    <div class="sec-eyebrow">01 / ABOUT</div>
+    <h2 class="sec-title">Hardware first,<br>silicon always.</h2>
+    <div class="about-grid">
+      <div>
+        <p>I got into chip design through hardware — building PCBs, debugging embedded firmware, and tracing signals with a logic analyzer before writing any RTL. That hands-on instinct still shapes how I work: <strong>I want to see the waveform, not just trust the theory.</strong></p>
+        <p>Right now my focus is physical design — taking RTL through synthesis, floorplanning, placement, and routing to watch it become silicon. I run these flows independently using OpenROAD, documenting each stage rather than treating it as a black box.</p>
+        <p>Based in Bengaluru, which puts me close to a dense cluster of chip design hiring — an advantage I plan to use.</p>
+      </div>
+      <div class="stat-block">
+        <div class="stat-row"><span class="k">LOCATION</span><span class="v">Bengaluru, IN</span></div>
+        <div class="stat-row"><span class="k">YEAR</span><span class="v">4th · ECE</span></div>
+        <div class="stat-row"><span class="k">COLLEGE</span><span class="v">New Horizon CE</span></div>
+        <div class="stat-row"><span class="k">CGPA</span><span class="v">9.08 / 10</span></div>
+        <div class="stat-row"><span class="k">FOCUS</span><span class="v">Physical Design</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <div class="sec-eyebrow">02 / SKILLS</div>
+    <h2 class="sec-title">Floorplan</h2>
+    <div class="floorplan">
+      <div class="block">
+        <div class="net">block/physical_design</div>
+        <h3>Physical Design</h3>
+        <ul>
+          <li>Full RTL-to-GDS flow (OpenROAD)</li>
+          <li>Floorplanning, placement, CTS, routing</li>
+          <li>Timing closure & static timing analysis</li>
+          <li>Quartus Prime, Sky130 / Nangate45 PDKs</li>
+        </ul>
+      </div>
+      <div class="block">
+        <div class="net">block/verification</div>
+        <h3>Verification Fundamentals</h3>
+        <ul>
+          <li>SystemVerilog (OOP, randomization)</li>
+          <li>UVM architecture & concepts</li>
+          <li>APB / AMBA protocol basics</li>
+        </ul>
+      </div>
+      <div class="block">
+        <div class="net">block/hardware</div>
+        <h3>Hardware & Embedded</h3>
+        <ul>
+          <li>KiCad PCB design, BGA & multi-layer stackups</li>
+          <li>Embedded C on ESP32, RP2040</li>
+          <li>Protocol decoding — UART, SPI, I2C</li>
+        </ul>
+      </div>
+      <div class="block">
+        <div class="net">block/tooling</div>
+        <h3>Scripting & Tools</h3>
+        <ul>
+          <li>Tcl, Bash for flow automation</li>
+          <li>Python (pyserial, tooling scripts)</li>
+          <li>Git, Docker-based EDA environments</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="wrap">
+    <div class="sec-eyebrow">03 / PROJECTS</div>
+    <h2 class="sec-title">Selected work</h2>
+
+    <div class="proj">
+      <div class="proj-head">
+        <h3>16-bit ALU — RTL to GDS</h3>
+        <span class="status done">CLEAN TIMING · 0 DRC</span>
+      </div>
+      <p class="desc">Complete physical design flow run independently through OpenROAD on the Nangate45 PDK: synthesis, floorplanning, placement, CTS, and routing. Final result: 3,072 µm² die at 40% utilization, fmax of 111.79 MHz, zero setup/hold/DRC violations, and clean routing in three iterations.</p>
+      <div class="tags"><span>OpenROAD</span><span>Nangate45</span><span>STA</span><span>Docker</span></div>
+    </div>
+
+    <div class="proj">
+      <div class="proj-head">
+        <h3>NOMA Uplink Access Channel — FPGA Implementation</h3>
+        <span class="status done">PAPER SUBMITTED</span>
+      </div>
+      <p class="desc">Non-orthogonal multiple access system implemented on a Terasic DE1-SoC (Cyclone V), verified in ModelSim — BPSK modulation, fixed-point power scaling, superposition coding, and a SIC receiver. Backed by an 11-plot MATLAB simulation and submitted as an IEEE conference paper to NMITCON 2026.</p>
+      <div class="tags"><span>Verilog</span><span>DE1-SoC</span><span>MATLAB</span><span>ModelSim</span></div>
+    </div>
+
+    <div class="proj">
+      <div class="proj-head">
+        <h3>6-Channel USB Logic Analyzer</h3>
+        <span class="status done">SHIPPED</span>
+      </div>
+      <p class="desc">Logic analyzer built on a Raspberry Pi Pico H with a custom KiCad PCB. Debugged a PIO capture bug that limited it to one working channel, restructured firmware for re-triggerable capture over serial, and implemented UART/SPI/I2C protocol decoders. Publicly posted and hardware-verified channel by channel.</p>
+      <div class="tags"><span>RP2040</span><span>KiCad</span><span>PIO</span><span>Python</span></div>
+      <a class="link" href="https://github.com/mdeepesh232-design/usb-logic-analyzer" target="_blank" rel="noopener">github.com/mdeepesh232-design/usb-logic-analyzer →</a>
+    </div>
+
+    <div class="sub-label">EARLIER HARDWARE PROJECTS</div>
+    <div class="early-list">
+      <div class="early-item">
+        <h4>DIY SpO2 Monitor</h4>
+        Custom KiCad PCB with self-created footprints for MAX30102/SSD1306. 700+ LinkedIn impressions.
+      </div>
+      <div class="early-item">
+        <h4>Gesture-Controlled Car</h4>
+        Dual ESP32 setup using ESP-NOW and an MPU6050 for motion-based control.
+      </div>
+      <div class="early-item">
+        <h4>IoT Waste Segregation Bin</h4>
+        ESP32 and Blynk-based system for automated waste sorting.
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="contact" id="contact">
+  <div class="wrap">
+    <div class="contact-inner">
+      <div class="sec-eyebrow">04 / CONTACT</div>
+      <h2>Open to VLSI internship roles — Physical Design and Verification, in Bengaluru or remote.</h2>
+      <div class="contact-links">
+        <a class="btn primary" href="mailto:mdeepesh232@gmail.com">mdeepesh232@gmail.com</a>
+        <a class="btn" href="https://github.com/mdeepesh232-design" target="_blank" rel="noopener">GitHub →</a>
+        <a class="btn" href="https://www.linkedin.com/in/deepesh-m-aa5796353/" target="_blank" rel="noopener">LinkedIn →</a>
+      </div>
+    </div>
+  </div>
+  <div class="fine">
+    <span>Deepesh M — Bengaluru, India</span>
+    <span>Built with RTL discipline and too much coffee.</span>
+  </div>
+</footer>
+
+</body>
+</html>
