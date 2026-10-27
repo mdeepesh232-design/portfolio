@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deepesh M | VLSI design verification and physical design</title>
+<meta name="description" content="Final-year ECE student in Bengaluru. UVM verification, RTL-to-GDSII physical design with timing closure, FPGA and hardware protocol debugging.">
+<meta name="theme-color" content="#070B14">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="Deepesh M | VLSI design verification and physical design">
+<meta property="og:description" content="RTL to layout, verified. RISC-V core closed at 400 MHz, UVM testbench, USB logic analyzer, NOMA on FPGA.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%235B9BFF'/%3E%3Cstop offset='1' stop-color='%2337D6A0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='7' fill='%23070B14'/%3E%3Cpath d='M6 22h5V10h6v12h4v-6h5' fill='none' stroke='url(%23g)' stroke-width='2.6' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#070B14; --s1:#0D1525; --s2:#121C30; --bd:#22304A; --bd2:#2E4064;
+  --tx:#E8EEF8; --mu:#97A7C0; --link:#8DB8FF;
+  --blue:#5B9BFF; --green:#37D6A0; --amber:#FFB84D; --mag:#EC74D6;
+  --wait:rgba(255,184,77,.15);
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --display:"Bricolage Grotesque","IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--tx);font:400 1.0625rem/1.65 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* ambient background: soft glows and a faint die grid */
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(900px 520px at 12% -8%,rgba(91,155,255,.20),transparent 60%),
+    radial-gradient(800px 480px at 95% 8%,rgba(55,214,160,.13),transparent 60%),
+    radial-gradient(700px 500px at 60% 105%,rgba(236,116,214,.10),transparent 60%),
+    linear-gradient(rgba(138,164,214,.06) 1px,transparent 1px) 0 0/56px 56px,
+    linear-gradient(90deg,rgba(138,164,214,.06) 1px,transparent 1px) 0 0/56px 56px;
+  -webkit-mask-image:linear-gradient(180deg,#000 0,#000 55%,rgba(0,0,0,.35) 100%);
+          mask-image:linear-gradient(180deg,#000 0,#000 55%,rgba(0,0,0,.35) 100%)}
+
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+a{color:var(--link);text-underline-offset:3px}
+a:hover{text-decoration-thickness:2px}
+a:focus-visible,.btn:focus-visible,.scroll:focus-visible{outline:3px solid var(--blue);outline-offset:3px;border-radius:6px}
+
+/* sticky glass header */
+.bar{position:sticky;top:0;z-index:20;background:rgba(7,11,20,.7);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid rgba(46,64,100,.55)}
+.bar .wrap{display:flex;flex-wrap:wrap;gap:8px 28px;align-items:center;justify-content:space-between;padding-top:14px;padding-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px;font:700 1.15rem/1 var(--display);letter-spacing:-.01em;color:var(--tx);text-decoration:none}
+.brand svg{width:28px;height:28px;display:block}
+.bar nav{display:flex;gap:22px}
+.bar nav a{color:var(--mu);text-decoration:none;font-weight:500}
+.bar nav a:hover{color:var(--tx)}
+
+/* hero */
+.hero{padding:72px 0 8px}
+.status{display:inline-flex;align-items:center;gap:10px;padding:7px 14px;border:1px solid var(--bd2);border-radius:999px;background:rgba(18,28,48,.7);color:var(--mu);font-size:.95rem;margin:0 0 26px}
+.status i{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(55,214,160,.6);animation:pulse 2.4s ease-out infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 9px rgba(55,214,160,0)}100%{box-shadow:0 0 0 0 rgba(55,214,160,0)}}
+h1{font:700 clamp(2.6rem,6.8vw,5.1rem)/1.03 var(--display);letter-spacing:-.03em;margin:0 0 24px;max-width:17ch;
+  background:linear-gradient(180deg,#FFFFFF 25%,#A9BEE3 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{max-width:58ch;font-size:1.2rem;color:var(--mu);margin:0 0 32px}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-block;padding:.78rem 1.3rem;border:1.5px solid var(--bd2);border-radius:10px;font-weight:600;text-decoration:none;color:var(--tx);background:rgba(18,28,48,.6);transition:transform .15s,border-color .15s,box-shadow .15s}
+.btn:hover{border-color:var(--blue);transform:translateY(-2px)}
+.btn.go{border:0;color:#06101C;background:linear-gradient(135deg,var(--blue),var(--green));box-shadow:0 8px 28px -8px rgba(91,155,255,.7)}
+.btn.go:hover{box-shadow:0 12px 34px -8px rgba(55,214,160,.75)}
+
+/* diagram panel */
+.panel{margin:52px 0 0;padding:22px 22px 18px;border:1px solid var(--bd);border-radius:16px;background:linear-gradient(180deg,rgba(18,28,48,.9),rgba(10,17,31,.9));box-shadow:0 30px 80px -40px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.04)}
+.scroll{overflow-x:auto;padding-bottom:6px}
+.wf{display:block;width:100%;min-width:680px;height:auto;overflow:visible}
+.wf .grid{stroke:var(--bd2);stroke-width:1;stroke-dasharray:3 6;opacity:.7}
+.wf .wait{fill:var(--wait);opacity:0;animation:show .7s ease-out 1.9s forwards}
+.wf .trace{fill:none;stroke:#C9D6EC;stroke-width:2.3;stroke-linejoin:round;stroke-linecap:round;
+  stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.3s cubic-bezier(.3,.6,.3,1) forwards;animation-delay:var(--d)}
+.wf .trace.clk{stroke:var(--blue);filter:drop-shadow(0 0 5px rgba(91,155,255,.75))}
+.wf .trace.ready{stroke:var(--green);filter:drop-shadow(0 0 5px rgba(55,214,160,.75))}
+.wf .sig{font:500 13px var(--mono);fill:var(--mu)}
+.wf .phase{font:600 13px var(--sans);fill:var(--tx)}
+.wf .busl{font:500 12px var(--mono);fill:var(--mu)}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes show{to{opacity:1}}
+.panel figcaption{margin-top:12px;color:var(--mu);font-size:.95rem;max-width:72ch}
+
+/* stat tiles */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0 0;padding:0;list-style:none}
+.stat{--c:var(--blue);position:relative;padding:20px 20px 18px;border:1px solid var(--bd);border-radius:14px;background:linear-gradient(180deg,var(--s2),var(--s1));overflow:hidden}
+.stat::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--c);box-shadow:0 0 18px 2px var(--c)}
+.stat:nth-child(2){--c:var(--green)}.stat:nth-child(3){--c:var(--amber)}.stat:nth-child(4){--c:var(--mag)}
+.stat b{display:block;white-space:nowrap;font:700 clamp(1.35rem,3.2vw,2.3rem)/1.1 var(--display);letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--tx)}
+.stat span{display:block;margin-top:6px;color:var(--mu);font-size:.95rem;line-height:1.4}
+
+/* sections */
+section{padding:92px 0 0}
+h2{font:700 clamp(1.8rem,3.8vw,2.6rem)/1.1 var(--display);letter-spacing:-.02em;margin:0 0 16px}
+h2::after{content:"";display:block;width:60px;height:4px;margin-top:14px;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--green))}
+h3{font:600 1.35rem/1.25 var(--display);letter-spacing:-.01em;margin:0 0 6px}
+.intro{max-width:64ch;color:var(--mu);margin:0 0 30px}
+
+/* timing report */
+.report{border:1px solid var(--bd);border-radius:16px;background:linear-gradient(180deg,var(--s2),var(--s1));overflow:hidden;box-shadow:0 30px 80px -50px rgba(0,0,0,.9)}
+.report .head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--bd);background:rgba(7,11,20,.35)}
+.report .head strong{font-weight:600}
+.pill{display:inline-block;padding:3px 12px;border-radius:999px;font-size:.85rem;font-weight:600;border:1px solid}
+.pill.ok{color:var(--green);border-color:rgba(55,214,160,.5);background:rgba(55,214,160,.1)}
+.pill.info{color:var(--mu);border-color:var(--bd2);background:rgba(151,167,192,.08)}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:660px}
+th,td{text-align:left;padding:14px 22px;vertical-align:top;border-bottom:1px solid var(--bd)}
+tr:last-child th,tr:last-child td{border-bottom:0}
+thead th{font-size:.88rem;color:var(--mu);font-weight:500}
+tbody th{font-weight:600}
+td.num{font:500 1rem var(--mono);color:var(--tx);white-space:nowrap}
+td.num.good{color:var(--green)}
+tbody tr:hover{background:rgba(91,155,255,.05)}
+.note{margin:18px 0 0;max-width:72ch;color:var(--mu)}
+
+/* project cards */
+.key{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0 0 28px;padding:0;list-style:none;color:var(--mu);font-size:.95rem}
+.key li{display:flex;align-items:center;gap:8px}
+.key i{width:10px;height:10px;border-radius:50%;background:var(--c);box-shadow:0 0 10px var(--c)}
+.pd{--c:var(--green)}.ver{--c:var(--blue)}.hw{--c:var(--amber)}.fpga{--c:var(--mag)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,470px),1fr));gap:20px}
+.card{position:relative;display:flex;flex-direction:column;padding:28px 28px 24px;border:1px solid var(--bd);border-radius:16px;background:linear-gradient(180deg,var(--s2),var(--s1));overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s}
+.card::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--c);box-shadow:0 0 20px 2px var(--c)}
+.card:hover{transform:translateY(-4px);border-color:var(--c);box-shadow:0 22px 50px -26px var(--c)}
+.area{display:flex;align-items:center;gap:8px;margin:0 0 10px;color:var(--c);font-weight:600;font-size:.92rem}
+.area::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 10px var(--c)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 16px;padding:0;list-style:none}
+.chips li{padding:3px 11px;border:1px solid var(--bd2);border-radius:999px;background:rgba(7,11,20,.45);color:var(--mu);font-size:.85rem}
+.card ul.pts{margin:0 0 18px;padding-left:1.15rem}
+.card ul.pts li{margin:0 0 8px}
+.card ul.pts li::marker{color:var(--c)}
+.card .src{margin-top:auto;align-self:flex-start;display:inline-block;padding:.5rem .95rem;border:1px solid var(--bd2);border-radius:8px;color:var(--tx);font-weight:600;font-size:.95rem;text-decoration:none;transition:border-color .15s,background .15s}
+.card .src:hover{border-color:var(--c);background:rgba(255,255,255,.04)}
+.card.wide{grid-column:1/-1}
+
+/* skills and small lists */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px}
+.box{padding:22px 24px;border:1px solid var(--bd);border-radius:14px;background:linear-gradient(180deg,var(--s2),var(--s1))}
+.box h3{font-size:1.05rem;margin:0 0 12px}
+.box .chips{margin:0}
+.box p{margin:0;color:var(--mu)}
+.box p b{display:block;color:var(--tx);font-weight:600;margin-bottom:4px}
+.box.c1{border-top:3px solid var(--blue)}.box.c2{border-top:3px solid var(--green)}.box.c3{border-top:3px solid var(--amber)}.box.c4{border-top:3px solid var(--mag)}
+
+/* contact */
+.contact .big{padding:44px 40px;border:1px solid var(--bd2);border-radius:20px;background:
+  radial-gradient(600px 260px at 0% 0%,rgba(91,155,255,.18),transparent 70%),
+  radial-gradient(500px 260px at 100% 100%,rgba(55,214,160,.14),transparent 70%),
+  linear-gradient(180deg,var(--s2),var(--s1))}
+.contact p{max-width:56ch;font-size:1.15rem;margin:0 0 26px}
+.links{display:flex;flex-wrap:wrap;gap:12px}
+footer{margin-top:90px;padding:26px 0 44px;border-top:1px solid var(--bd);color:var(--mu);font-size:.95rem}
+
+/* gentle reveal on scroll (only when JS runs) */
+.js .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+.js .reveal.in{opacity:1;transform:none}
+
+@media (max-width:860px){.stats{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){
+  .hero{padding-top:44px}
+  section{padding-top:68px}
+  .panel{padding:16px 14px 14px}
+  .card{padding:22px 20px 20px}
+  .contact .big{padding:30px 22px}
+  .stats{grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .status i{animation:none}
+  .wf .trace{animation:none;stroke-dashoffset:0}
+  .wf .wait{animation:none;opacity:1}
+  .js .reveal{opacity:1;transform:none;transition:none}
+  .btn:hover,.card:hover{transform:none}
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Deepesh M, back to top">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5B9BFF"/><stop offset="1" stop-color="#37D6A0"/></linearGradient></defs><rect width="32" height="32" rx="7" fill="#121C30" stroke="#2E4064"/><path d="M6 22h5V10h6v12h4v-6h5" fill="none" stroke="url(#lg)" stroke-width="2.6" stroke-linejoin="round"/></svg>
+      Deepesh M
+    </a>
+    <nav aria-label="Main">
+      <a href="#projects">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top" class="wrap">
+  <div class="hero">
+    <p class="status"><i></i>Open to VLSI internships in Bengaluru</p>
+    <h1>I take digital designs from RTL to layout, and verify they work.</h1>
+    <p class="lede">Final-year ECE student in Bengaluru. I'm looking for VLSI design verification and post-silicon validation internships with full-time conversion.</p>
+    <div class="actions">
+      <a class="btn go" href="#projects">See projects</a>
+      <a class="btn" href="MDeepesh_Resume_Updated.pdf">Download resume</a>
+      <a class="btn" href="#contact">Get in touch</a>
+    </div>
+
+    <figure class="panel">
+      <div class="scroll" tabindex="0" aria-label="Timing diagram, scrolls sideways on small screens">
+<svg class="wf" viewBox="0 0 956 340" role="img" aria-labelledby="wf-t wf-d" xmlns="http://www.w3.org/2000/svg">
+<title id="wf-t">APB write with two wait states</title>
+<desc id="wf-d">Timing diagram of an APB write. PSEL rises first, PENABLE rises one cycle later, PREADY stays low for two cycles, then goes high and the transfer completes.</desc>
+<rect class="wait" x="320" y="34" width="210" height="296"/>
+<line class="grid" x1="110" y1="34" x2="110" y2="330"/>
+<line class="grid" x1="215" y1="34" x2="215" y2="330"/>
+<line class="grid" x1="320" y1="34" x2="320" y2="330"/>
+<line class="grid" x1="425" y1="34" x2="425" y2="330"/>
+<line class="grid" x1="530" y1="34" x2="530" y2="330"/>
+<line class="grid" x1="635" y1="34" x2="635" y2="330"/>
+<line class="grid" x1="740" y1="34" x2="740" y2="330"/>
+<line class="grid" x1="845" y1="34" x2="845" y2="330"/>
+<line class="grid" x1="950" y1="34" x2="950" y2="330"/>
+<text class="phase" x="267.5" y="24" text-anchor="middle">Setup</text>
+<text class="phase" x="425" y="24" text-anchor="middle">Wait states</text>
+<text class="phase" x="582.5" y="24" text-anchor="middle">Done</text>
+<text class="sig" x="0" y="94">PCLK</text>
+<text class="sig" x="0" y="146">PSEL</text>
+<text class="sig" x="0" y="198">PENABLE</text>
+<text class="sig" x="0" y="250">PREADY</text>
+<text class="sig" x="0" y="302">PWDATA</text>
+<path class="trace clk" pathLength="1" style="--d:0.0s" d="M110,104 L110,76 L162.5,76 L162.5,104 L215,104 L215,76 L267.5,76 L267.5,104 L320,104 L320,76 L372.5,76 L372.5,104 L425,104 L425,76 L477.5,76 L477.5,104 L530,104 L530,76 L582.5,76 L582.5,104 L635,104 L635,76 L687.5,76 L687.5,104 L740,104 L740,76 L792.5,76 L792.5,104 L845,104 L845,76 L897.5,76 L897.5,104 L950,104"/>
+<path class="trace " pathLength="1" style="--d:0.25s" d="M110,156 L215,156 L215,128 L635,128 L635,156 L950,156"/>
+<path class="trace " pathLength="1" style="--d:0.5s" d="M110,208 L320,208 L320,180 L635,180 L635,208 L950,208"/>
+<path class="trace ready" pathLength="1" style="--d:0.75s" d="M110,260 L530,260 L530,232 L635,232 L635,260 L950,260"/>
+<path class="trace " pathLength="1" style="--d:1.0s" d="M110,298 L215,298 L223,284 L627,284 L635,298 L950,298"/>
+<path class="trace " pathLength="1" style="--d:1.0s" d="M215,298 L223,312 L627,312 L635,298"/>
+<text class="busl" x="425.0" y="302" text-anchor="middle">write data</text>
+</svg>
+      </div>
+      <figcaption>An APB write with two wait states: the slave holds PREADY low until it is ready. This is the protocol behind my UVM testbench.</figcaption>
+    </figure>
+
+    <ul class="stats">
+      <li class="stat"><b>400 MHz</b><span>RISC-V core taken from RTL to GDSII with timing closed</span></li>
+      <li class="stat"><b>+0.21 ns</b><span>setup slack at 400 MHz on Nangate45</span></li>
+      <li class="stat"><b>~7,900</b><span>constrained-random checks, 0 mismatches</span></li>
+      <li class="stat"><b>9.08</b><span>CGPA, final-year ECE at New Horizon College</span></li>
+    </ul>
+  </div>
+
+  <section id="timing" class="reveal">
+    <h2>Timing closure on the RISC-V core</h2>
+    <p class="intro">Final numbers from my RTL-to-GDSII run at 400 MHz. Slack is the margin on a timing check: positive means it passes, negative means a violation.</p>
+    <div class="report">
+      <div class="head"><strong>Single-cycle RISC-V core, OpenROAD (ORFS), Nangate45</strong><span class="pill ok">All checks met</span></div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th scope="col">Check</th><th scope="col">Result</th><th scope="col">Status</th><th scope="col">What it tells you</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Clock period</th><td class="num">2.5 ns (400 MHz)</td><td><span class="pill info">Target</span></td><td>The time each cycle lasts. Every path has to finish inside it.</td></tr>
+            <tr><th scope="row">Setup slack</th><td class="num good">+0.21 ns</td><td><span class="pill ok">Met</span></td><td>Data arrived 0.21 ns before the deadline set by the next clock edge.</td></tr>
+            <tr><th scope="row">Hold slack</th><td class="num good">+0.11 ns</td><td><span class="pill ok">Met</span></td><td>Data stayed stable 0.11 ns longer than the minimum after the clock edge.</td></tr>
+            <tr><th scope="row">Removal slack</th><td class="num good">+0.12 ns</td><td><span class="pill ok">Met</span></td><td>Hold's counterpart for releasing reset: it came 0.12 ns later than the minimum.</td></tr>
+            <tr><th scope="row">Area</th><td class="num">~13,800 µm²</td><td><span class="pill info">Reported</span></td><td>Placed and routed size, with 1,024 flops.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="note">I swept the clock from 10 ns down to 2 ns and fitted slack ≈ 0.6×T − 1.35 ns. That puts reset removal as the next limit, at about 1.9 ns.</p>
+  </section>
+
+  <section id="projects">
+    <h2 class="reveal">Projects</h2>
+    <ul class="key reveal" aria-label="Color key">
+      <li class="ver"><i></i>Verification</li>
+      <li class="pd"><i></i>Physical design</li>
+      <li class="hw"><i></i>Hardware and debug</li>
+      <li class="fpga"><i></i>FPGA and communications</li>
+    </ul>
+    <div class="cards">
+      <article class="card pd wide reveal">
+        <p class="area">Physical design and verification</p>
+        <h3>Single-cycle RISC-V core: RTL-to-GDSII and verification</h3>
+        <ul class="chips"><li>Verilog</li><li>Yosys</li><li>OpenROAD (ORFS)</li><li>Nangate45</li><li>Docker</li></ul>
+        <ul class="pts">
+          <li>Designed a single-cycle core (12 instructions, 32x32 register file, 1,024 flops) and took it through RTL-to-GDSII.</li>
+          <li>Debugged a hollow first run: a constant instruction let synthesis prune the register file down to 30 flops. I confirmed it from a LOGIC0-driven net, then added memory ports and a top-level wrapper to get a real 1,024-flop baseline.</li>
+          <li>Verified with a 22-check directed test, a monitor and scoreboard (135 checks), and constrained-random tests (20 seeds, about 7,900 checks, 0 mismatches). Mutation tests confirmed the checkers catch injected bugs.</li>
+        </ul>
+        <a class="src" href="https://github.com/mdeepesh232-design/riscv-rtl2gds">View source on GitHub</a>
+      </article>
+
+      <article class="card ver reveal">
+        <p class="area">Verification</p>
+        <h3>APB UVM verification testbench</h3>
+        <ul class="chips"><li>SystemVerilog</li><li>UVM 1.2</li><li>Cadence Xcelium</li><li>Icarus Verilog</li><li>GTKWave</li></ul>
+        <ul class="pts">
+          <li>Built a directed APB testbench for a 4-register slave, covering register access and a PREADY wait state.</li>
+          <li>Refactored it into a UVM environment (driver, monitor, sequencer, agent, env, test) and ran it on Cadence Xcelium with 0 UVM_ERROR and 0 UVM_FATAL.</li>
+          <li>Fixed a driver bug by polling PREADY in a loop instead of assuming a fixed transfer length.</li>
+        </ul>
+      </article>
+
+      <article class="card hw reveal">
+        <p class="area">Hardware and debug</p>
+        <h3>USB logic analyzer on Raspberry Pi Pico</h3>
+        <ul class="chips"><li>RP2040 (PIO and DMA)</li><li>Python</li><li>KiCad</li><li>ESP32</li></ul>
+        <ul class="pts">
+          <li>Built a 6-channel analyzer using PIO and DMA sampling, with a custom binary capture protocol over USB serial.</li>
+          <li>Wrote Python decoders for UART, SPI and I2C, validated against real captures from an ESP32 and an MPU6050.</li>
+          <li>Traced a silent I2C fault to a regression in the ESP32 Arduino core's I2C driver, not the hardware, by separating wiring, timing and library causes.</li>
+          <li>Designed a DRC-clean 2-layer KiCad PCB with 5V-tolerant inputs and I2C pull-ups.</li>
+        </ul>
+        <a class="src" href="https://github.com/mdeepesh232-design/usb-logic-analyzer">View source on GitHub</a>
+      </article>
+
+      <article class="card fpga wide reveal">
+        <p class="area">FPGA and communications</p>
+        <h3>NOMA underwater acoustic communication on FPGA</h3>
+        <ul class="chips"><li>Final year project, team of 3</li><li>MATLAB</li><li>Verilog</li><li>Quartus Prime</li><li>DE1-SoC (Cyclone V)</li></ul>
+        <ul class="pts">
+          <li>Simulated a 2-user power-domain NOMA link over an underwater acoustic channel in MATLAB (BPSK, SIC, Thorp path loss, Rician fading K=3, colored noise).</li>
+          <li>Implemented it as synthesizable Verilog (FSM-based) on a DE1-SoC with a 50 MHz clock and +5.3 ns setup slack.</li>
+          <li>Measured per-user BER against SNR on the board for UWA and AWGN channels and compared it with the MATLAB reference. A second conference paper is in preparation.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section id="skills">
+    <h2 class="reveal">Skills</h2>
+    <div class="grid2">
+      <div class="box c1 reveal"><h3>Languages and HDL</h3><ul class="chips"><li>C</li><li>C++</li><li>Python</li><li>Verilog</li><li>VHDL</li><li>SystemVerilog</li><li>UVM</li></ul></div>
+      <div class="box c2 reveal"><h3>EDA tools</h3><ul class="chips"><li>Cadence Virtuoso</li><li>Innovus</li><li>NCLaunch</li><li>Xcelium</li><li>ModelSim</li><li>Quartus Prime</li><li>OpenROAD (ORFS)</li><li>Yosys</li><li>KLayout</li><li>MATLAB</li></ul></div>
+      <div class="box c3 reveal"><h3>Hardware and debug</h3><ul class="chips"><li>UART, SPI, I2C decode</li><li>Static timing analysis</li><li>ESP32</li><li>Raspberry Pi Pico</li><li>Arduino Nano</li><li>KiCad</li></ul></div>
+      <div class="box c4 reveal"><h3>Environment</h3><ul class="chips"><li>Linux</li><li>Windows</li><li>Git</li><li>Docker</li></ul></div>
+    </div>
+  </section>
+
+  <section id="earlier">
+    <h2 class="reveal">Earlier work</h2>
+    <div class="grid2">
+      <div class="box c2 reveal"><p><b>16-bit ALU, RTL to GDS</b>OpenROAD on Nangate45: 3,072 µm² die at 40% utilization, fmax 111.79 MHz, zero setup, hold and DRC violations.</p></div>
+      <div class="box c3 reveal"><p><b>DIY SpO2 monitor</b>KiCad PCB with custom footprints for the MAX30102 sensor and SSD1306 OLED, exported as JLCPCB-ready Gerbers.</p></div>
+      <div class="box c3 reveal"><p><b>Gesture-controlled car</b>Two ESP32 boards using ESP-NOW and an MPU6050 for motion control.</p></div>
+      <div class="box c3 reveal"><p><b>IoT waste segregation bin</b>ESP32 and Blynk system for automated waste sorting.</p></div>
+    </div>
+  </section>
+
+  <section id="education">
+    <h2 class="reveal">Education and certifications</h2>
+    <div class="grid2">
+      <div class="box c1 reveal"><p><b>BE, Electronics and Communication Engineering</b>New Horizon College of Engineering, Bengaluru, 2023 to 2027, CGPA 9.08.</p></div>
+      <div class="box c2 reveal"><p><b>VSD: Physical Design Flow</b>Udemy, instructor Kunal Ghosh, October 2026, 6.5 hours.</p></div>
+      <div class="box c4 reveal"><p><b>Cisco CCNA: Introduction to Networks</b>November 2025, via Cisco Networking Academy.</p></div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <div class="big reveal">
+      <h2>Contact</h2>
+      <p>I'm open to VLSI design verification and post-silicon validation internships in Bengaluru or remote. Email is the quickest way to reach me.</p>
+      <div class="links">
+        <a class="btn go" href="mailto:mdeepesh232@gmail.com">mdeepesh232@gmail.com</a>
+        <a class="btn" href="https://github.com/mdeepesh232-design">GitHub</a>
+        <a class="btn" href="https://www.linkedin.com/in/deepesh-m-aa5796353/">LinkedIn</a>
+        <a class="btn" href="MDeepesh_Resume_Updated.pdf">Resume (PDF)</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">Deepesh M, Bengaluru, India</div></footer>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var items=document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)||window.matchMedia('(prefers-reduced-motion: reduce)').matches){return;}
+  root.classList.add('js');
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+  },{threshold:.12,rootMargin:'0px 0px -6% 0px'});
+  items.forEach(function(el){io.observe(el);});
+})();
+</script>
+</body>
+</html>
